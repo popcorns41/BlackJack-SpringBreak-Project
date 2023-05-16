@@ -2,7 +2,6 @@ import GraphicalRepresentation as gr
 import PlayerClasses as pc
 import CardsClub as cc
 
-##helper functions:
 
 class Controller:
     def __init__(self):
@@ -19,7 +18,6 @@ class Controller:
         playerMenuInput = int(self.playerTerminal.requestMenu())
 
         match playerMenuInput:
-            ##like a really morbid recursion forever!
             case 1:
                 self.startGame()
             case 2:
@@ -169,9 +167,7 @@ class Controller:
         print("\n",player.playerName,"turn")
         self.displayPort.displayGivenHand(player.playerHand)
         handValueCards = [o.value for o in player.playerHand]
-        print("card hand Values:",handValueCards)
         splitTrue = checkList(handValueCards)
-        print("is there a split?",splitTrue)
         #second argument is to determine if the player can split
         playAction = self.playerTerminal.playerPlayChoices(firstRoundBoolean,splitTrue)
         match playAction:
@@ -313,6 +309,8 @@ class Controller:
     def closeGame(self):
         print("All players have left the table. Have a great day!")
         quit()
+
+##helper functions:
 
 def checkList(lst):
     ele = lst[0]
