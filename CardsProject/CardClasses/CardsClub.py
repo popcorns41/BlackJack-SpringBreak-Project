@@ -1,5 +1,5 @@
 import random
-import cardGenerationMethods as cgm
+import CardClasses.cardGenerationMethods as cgm
 
 Red, Black = True, False
 

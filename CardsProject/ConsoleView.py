@@ -1,60 +1,7 @@
-import cardGenerationMethods as cgm
-import CardsClub as cc
+import CardClasses.cardGenerationMethods as cgm
+import CardClasses.GraphicsMethods as cvm
 
-##Ascii representation methods from src: https://codereview.stackexchange.com/questions/82103/ascii-fication-of-playing-cards
 
-def ascii_version_of_card(cards,return_string=True):
-        """
-        Instead of a boring text version of the card we render an ASCII image of the card.
-        :param cards: One or more card objects
-        :param return_string: By default we return the string version of the card, but the dealer hide the 1st card and we
-        keep it as a list so that the dealer can add a hidden card in front of the list
-        """
-
-        # create an empty list of list, each sublist is a line
-        lines = [[] for i in range(9)]
-        for card in cards:
-            if (card.reveal):
-                # "King" should be "K" and "10" should still be "10"
-                if card.value == 9:  # ten is the only one who's rank is 2 char long
-                        rank = cgm.valueStr(card.value)
-                        space = ''  # if we write "10" on the card that line will be 1 char to long
-                else:
-                        rank = cgm.valueStr(card.value)  # some have a rank of 'King' this changes that to a simple 'K' ("King" doesn't fit)
-                        space = ' '  # no "10", we use a blank space to will the void
-                    # get the cards suit in two steps
-                suit = cgm.suitSymbol(card.suit)
-
-                # add the individual card on a line by line basis
-                lines[0].append('┌─────────┐')
-                lines[1].append('│{}{}       │'.format(rank, space))  # use two {} one for char, one for space or char
-                lines[2].append('│         │')
-                lines[3].append('│         │')
-                lines[4].append('│    {}    │'.format(suit))
-                lines[5].append('│         │')
-                lines[6].append('│         │')
-                lines[7].append('│       {}{}│'.format(space, rank))
-                lines[8].append('└─────────┘')
-            else:
-                lines[0].append('┌─────────┐')
-                lines[1].append('│░░░░░░░░░│')  
-                lines[2].append('│░░░░░░░░░│')
-                lines[3].append('│░░░░░░░░░│')
-                lines[4].append('│░░░░░░░░░│')
-                lines[5].append('│░░░░░░░░░│')
-                lines[6].append('│░░░░░░░░░│')
-                lines[7].append('│░░░░░░░░░│')
-                lines[8].append('└─────────┘')
-
-        result = []
-        for index, line in enumerate(lines):
-            result.append(''.join(lines[index]))
-
-        # hidden cards do not use string
-        if return_string:
-            return '\n'.join(result)
-        else:
-            return result
 
 #display messages
 
@@ -105,7 +52,7 @@ class playerTerminal:
 class graphics:
         ##Ascii representation of cards
         def displayGivenHand(self,hand):
-                print(ascii_version_of_card(hand))
+                print(cvm.ascii_version_of_card(hand))
                 pass
         def playerHandDisplay(self,playerName,playerHand):
                 print("\n--------------")
@@ -131,8 +78,11 @@ class graphics:
         def blackJackWin(self):
                 print("That is Black Jack!")
                 pass
-        def bust(self,handValue):
-                print("Your hand's value of",handValue,"is a bust :(")
+        def bust(self,handValue,playerName):
+                print(playerName,"hand's value of",handValue,"is a bust :(")
+        def betGain(self,playerName,betTotal):
+                print("Player",playerName,"has won £" + str(betTotal))
+                pass
         def ifBetValid(self,state,betTotal):
                 if (state and betTotal > 0):
                         print("Player has placed a bet of: £" + str(betTotal))
@@ -141,6 +91,63 @@ class graphics:
                 else:
                         print("Your bet of: £" + str(betTotal) + " is not valid due to insufficient funds; please try again")
                 pass
-                        
+        def naturalBlackJack(self,playerName):
+                print("Natural Black Jack! Player",playerName,"wins!")
+                pass
+        #Dealer Prompts
+        def dealerShowsHand(self,dealerHand):
+                print("Dealer shows their cards")
+                self.displayGivenHand(dealerHand)
+                pass
+        def dealerStick(self):
+                print("Dealer sticks")
+                pass
+        def dealerBust(self):
+                print("Dealer has bust")
+                pass
+        def displayComparehands(self):
+                print("comparing hands")
+                pass
+        #end of round outcomes
+        def roundFinished(self):
+                print("All players' round is complete; dealer begins play")
+                pass   
+        def playerTurn(self,playerName):
+                print("Player",playerName,"turn")
+                pass
+        def playerDoubleDown(self,playerName):
+                print("Player",playerName,"has doubled down")
+                pass
+        def invalidOption(self):
+                print("Invalid option, please try again")
+                pass
+        def surrenderHand(self,playerName):
+                print("Player",playerName,"has surrendered their hand")
+                pass
+        def beatenByDealer(self,playerName):
+                print("Player",playerName,"has been beaten by the dealer")
+                pass
+        def pushTwentyTwo(self,playerName):
+                print("Push 22!")
+                print(playerName,"you went bust; but you get your money back!")
+                pass
+        def userBustLose(self,playerName):
+                print("Player",playerName,"has lost their bet")
+                pass
+        def userDraw(self,playerName):
+                print("Player",playerName,"has drawn with the dealer")
+                print("bet returned")
+                pass
+        def userWin(self,playerName):
+                print("Player",playerName,"has beat the dealer and won their bet")
+                pass
+        def nonNaturalBlackJack(self,playerName):
+                print("Player",playerName,"has won with a Black Jack")
+                pass
+        #end game message
+        def endGame(self):
+                print("All players have left the table. Have a great day!")
+                pass
+        
 
     

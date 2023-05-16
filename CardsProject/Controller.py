@@ -1,6 +1,6 @@
-import GraphicalRepresentation as gr
-import PlayerClasses as pc
-import CardsClub as cc
+import ConsoleView as gr
+import PlayerClasses.PlayerClasses as pc
+import CardClasses.CardsClub as cc
 
 
 class Controller:
@@ -113,7 +113,7 @@ class Controller:
             naturalBlackJackCheck = self.valueCheck(playerList[i])
             playersInPlay[i] = naturalBlackJackCheck
             if (naturalBlackJackCheck):
-                print("That is natural BlackJack; Congratulations!")
+                self.displayPort.naturalBlackJack(playerList[i].playerName)
         self.multiPlayerChannel(deck,dealer,playerList,playersInPlay,totalPlayers,0)
 
 
@@ -123,7 +123,7 @@ class Controller:
         if (valueCheck == 21):
             return True
         elif (valueCheck > 21):
-            print(player.playerName,"has gone bust and forfeits their turn")
+            self.displayPort.bust(valueCheck,player.playerName)
             return True
         else:
             return False
@@ -136,7 +136,7 @@ class Controller:
             firstRoundBoolean = True
        #create scenerio for all blackjacks
         if all(playersInPlay):
-            print("All players' round is complete; dealer begins play")
+            self.displayPort.roundFinished()
             self.dealerPlay(deck,dealer,playerList,totalPlayers)
             self.endRoundClear(deck,playerList,totalPlayers,dealer)
         else:
@@ -164,7 +164,7 @@ class Controller:
         
     def roundLoop(self,deck,player,dealer,firstRoundBoolean):
         ##implement beginning round bet
-        print("\n",player.playerName,"turn")
+        self.displayPort.playerTurn(player.playerName)
         self.displayPort.displayGivenHand(player.playerHand)
         handValueCards = [o.value for o in player.playerHand]
         splitTrue = checkList(handValueCards)
@@ -185,7 +185,7 @@ class Controller:
                 #system will also validate if player has the possible balance to make this double
                 #failure to do so will open up player actions again (input system to remove this opinion without player possibly an enumerated for loop with possible options)
                 if (firstRoundBoolean):
-                    print("Player Doubles-down")
+                    self.displayPort.playerDoubleDown(player.playerName)
                     playerBet = player.currentRoundBet
                     result = player.placeBet(playerBet)
                     doubleBet = 2 * playerBet
@@ -197,19 +197,19 @@ class Controller:
                         self.displayPort.ifBetValid(result,doubleBet)
                         self.roundLoop(deck,player,dealer,False)
                 else:
-                    print("option invalid; try again")
+                    self.displayPort.invalidOption()
                     self.roundLoop(deck,player,dealer,False)
             case 4:
                 #convert to function
                 if (firstRoundBoolean):
-                    print(player.playerName,"surrenders their hand!")
+                    self.displayPort.surrenderHand(player.playerName)
                     player.handValue = -1
                     return True
                 else:
-                    print("option invalid; try again")
+                    self.displayPort.invalidOption()
                     self.roundLoop(deck,player,dealer,False)
             case 5:
-                #does not work :/
+                #Split functionality is currently unoperational
                 if (firstRoundBoolean and splitTrue):
                     #creates a new instance of a player attributed as the split hand
                     masterName = player.playerName
@@ -218,7 +218,7 @@ class Controller:
                     splitPlayer = pc.split(masterName,cardHit,givenBet)
                     return splitPlayer
                 else:
-                    print("option invalid; try again")
+                    self.displayPort.invalidOption()
                     self.roundLoop(deck,player,dealer,False)
                     
                     
@@ -238,13 +238,13 @@ class Controller:
         pass
         
     def bustPath(self,player):
-        print("you ended here! In bust!")
+        self.displayPort.bust(player.handValueCalculation(),player.playerName)
         self.displayPort.bust(player.handValueCalculation())
         pass
     def winPath(self,player,playerBet):
         #self.displayPort.blackJackWin()
         betGain = playerBet * 1.5
-        print("total bet gained is",betGain)
+        self.displayPort.betGain(player.playerName,betGain)
         player.winBet(betGain)
         pass
     def compareHands(self,dealerHandValue,playerList,totalPlayers):
@@ -254,40 +254,37 @@ class Controller:
             playerBet = currentPlayer.currentRoundBet
             playerHandValue = currentPlayer.handValueCalculation()
             if ((dealerHandValue > playerHandValue) and (dealerHandValue <= 21) and (playerHandValue <= 21) and (playerHandValue > 0)):
-                print(playerName,"loses to the dealer!")
+                self.displayPort.beatenByDealer(playerName)
             elif(playerHandValue == -1):
                 playerHalfBet = playerBet/2
                 currentPlayer.winBet(playerHalfBet)
                 #player has surrendered
                 pass
             elif ((playerHandValue > 0) and (dealerHandValue == 22) and (playerHandValue < 29) and (playerHandValue > 21)):
-                  print("Push 22!")
-                  print(playerName,"you went bust; but you get your money back!")
-                  currentPlayer.winBet(playerBet)
+                self.displayPort.pushTwentyTwo(playerName)
+                currentPlayer.winBet(playerBet)
             elif(playerHandValue > 21):
-                print(playerName,"has gone bust, and lost their bet")
+                self.displayPort.userBustLose(playerName)
             elif ((dealerHandValue == playerHandValue) and (playerHandValue <= 21)):
-                print(playerName,"draws with the dealer")
-                print("bet returned")
+                self.displayPort.userDraw(playerName)
                 currentPlayer.winBet(playerBet)
             elif ((playerHandValue > dealerHandValue) and (playerHandValue <= 21)):
-                print(playerName,"beats the dealer!")
+                self.displayPort.userWin(playerName)
                 self.winPath(currentPlayer,playerBet)
             elif (playerHandValue == 21):
-                print(playerName,"gets BlackJack!")
+                self.displayPort.nonNaturalBlackJack(playerName)
                 self.winPath(currentPlayer,playerBet)
             else:
                 self.winPath(currentPlayer,playerBet)
-                print(playerName,"beats the dealer!")
+                self.displayPort.userWin(playerName)
         pass
     def dealerPlay(self,deck,dealer,playerList,totalPlayers):
         dealerHand = dealer.playerHand
         shownHand = [dealerHand[i].flipFace(1) for i in range(len(dealerHand))]
-        print("dealer shows their hand")
-        self.displayPort.displayGivenHand(dealerHand)
+        self.displayPort.dealerShowsHand(dealerHand)
         dealerHandValue = self.playerHandValue(dealer)
         if dealerHandValue > 17:
-            print("dealer sticks")
+            self.displayPort.dealerStick()
             self.compareHands(dealerHandValue,playerList,totalPlayers)
             pass
         else:
@@ -295,19 +292,19 @@ class Controller:
                 if(dealerHandValue == 21):
                     self.displayPort.blackJackWin()
                 elif(dealerHandValue > 21):
-                    print("dealer bust!")
+                    self.displayPort.dealerBust()
                 else:
                     dealerDealtCard = deck.drawCard()
                     dealerDealtCard.flipFace(1)
                     dealer.hitToHand(dealerDealtCard)
                     self.displayPort.playerHandDisplay("Dealer",dealer.playerHand)
                     dealerHandValue = self.playerHandValue(dealer)
-            print("comparing hands")
+            self.displayPort.displayComparehands()
             self.compareHands(dealerHandValue,playerList,totalPlayers)
         pass
     
     def closeGame(self):
-        print("All players have left the table. Have a great day!")
+        self.displayPort.endGame()
         quit()
 
 ##helper functions:
