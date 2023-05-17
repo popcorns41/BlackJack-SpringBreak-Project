@@ -18,7 +18,7 @@ class Player:
         elif (cardValue == 0):
             self.aceQuantity += 1
         self.playerHand.append(card)
-    #implement ace calculation improve after viewing coin question xx
+    #recursive function to find the optimal value of aces in your hand
     def recursionAceCalculation(self,value):
         if (value <= 21):
             return value

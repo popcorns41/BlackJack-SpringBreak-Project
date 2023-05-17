@@ -200,7 +200,6 @@ class Controller:
                     self.displayPort.invalidOption()
                     self.roundLoop(deck,player,dealer,False)
             case 4:
-                #convert to function
                 if (firstRoundBoolean):
                     self.displayPort.surrenderHand(player.playerName)
                     player.handValue = -1

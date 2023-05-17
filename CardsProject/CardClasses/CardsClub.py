@@ -32,13 +32,14 @@ class deckOfCards:
         for i in range(0,L):
             value = i % quarter
             suitValue = int(i/quarter)
-            self.cardDeck.append(playingCard(Black,False,value,suits[suitValue]))
+            colour = Black if (half < i) else Red
+            self.cardDeck.append(playingCard(colour,False,value,suits[suitValue]))
     def deckReset(self):
         self.cardDeck = []
     def deckSizeMultiplier(self,m):
         return self.deckSize * m
     def shuffle(self):
-        random.shuffle(self.cardDeck);
+        random.shuffle(self.cardDeck)
     def drawCard(self):
         drawnCard = self.cardDeck.pop()
         #update deck length after pop
